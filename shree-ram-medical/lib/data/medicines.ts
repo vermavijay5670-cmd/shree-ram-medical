@@ -63,27 +63,6 @@ const raw: RawMedicine[] = [
     storage: "Store below 25°C in a cool, dry place away from direct sunlight. Keep out of reach of children.",
   },
   {
-  name: "Neurobion Forte",
-  comp: "Thiamine Mononitrate (B1) + Riboflavin (B2) + Nicotinamide (B3) + Calcium Pantothenate (B5) + Pyridoxine Hydrochloride (B6) + Cyanocobalamin (B12)",
-  strength: "B1 (10mg) + B2 (10mg) + B3 (45mg) + B5 (50mg) + B6 (3mg) + B12 (15mcg)",
-  pack: "Strip of 30 Tablets",
-  manufacturer: "Procter & Gamble Health Ltd.",
-  category: "Multivitamins / Nutritional Supplements",
-  categoryName: "Vitamin B-Complex",
-  rx: true, 
-  mrp: 47.53
-  price: 38.50, 
-  colors: ["#00d9a3", "#3d5cff"]
-  description: "Neurobion Forte is an oral vitamin B-complex supplement formulated to nourish nerve cells, treat structural B-vitamin deficiencies, and maintain healthy neurological functions. It supplies necessary coenzymes that optimize cellular metabolism and strengthen the central nervous system.",
-  uses: "Treatment and prevention of Vitamin B deficiencies. Management of diabetic neuropathy, peripheral neuropathy, and nerve inflammation. Relief from tingling, burning, or numbness in the hands and feet. Reducing general fatigue, muscle weakness, and supporting oral health against mouth ulcers.",
-  dosage: "Usage should be strictly as directed by a healthcare professional. Tablets are generally taken with a glass of water, usually after a meal, to minimize potential gastric discomfort.",
-  contraindications: "Hypersensitivity or known allergies to any of the active ingredients (such as thiamine, pyridoxine, or cobalamin). Not recommended for individuals with Leber's disease (hereditary optic nerve atrophy) as B12 can accelerate optic nerve damage. Not meant for pediatric use unless specifically prescribed by a pediatrician.",
-  warnings: "Do not exceed the recommended daily dose, as prolonged excessive intake can lead to sensory neuropathy. Pregnant or breastfeeding women must consult their doctor before starting the supplement. Individuals with chronic kidney disease, liver impairment, or severe malabsorption syndromes should use it strictly under medical supervision.",
-  sideEffects: "Generally well-tolerated. Common mild side effects include harmless bright yellow discoloration of the urine (due to Riboflavin excretion) and mild gastrointestinal issues like nausea, abdominal discomfort, or diarrhea. Rare allergic reactions include skin rashes, itching, or swelling.",
-  interactions: "May reduce the therapeutic efficacy of Levodopa (anti-Parkinson medication) due to Vitamin B6 content. Absorption of Vitamin B12 can be reduced by concurrent use of heavy antacids, H2 blockers, Proton Pump Inhibitors (like Omeprazole), and Metformin. Loop diuretics may decrease Thiamine (B1) levels in the body.",
-  storage: "Store in a cool, dry place at a temperature below 25°C. Protect the strip from direct sunlight, heat, and moisture. Keep the medication out of the reach and sight of children."
-  },
-  {
     name: "Augpen 625",
     comp: "Amoxicillin + Clavulanic Acid",
     strength: "625mg",
