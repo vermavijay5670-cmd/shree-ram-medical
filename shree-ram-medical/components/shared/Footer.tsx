@@ -39,7 +39,7 @@ export function Footer() {
         <div className={styles.brandCol}>
           <div className={styles.brand}>
             <BrandMark size={28} />
-            Shree Ram Medical
+            Shree Ram Medical Agency
           </div>
           <p className={styles.tagline}>
             Wholesale pharmaceutical distribution connecting manufacturers to
