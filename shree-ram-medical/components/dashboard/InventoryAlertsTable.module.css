@@ -1,0 +1,108 @@
+.tablePanel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-brand-sm);
+  padding: 22px;
+  overflow-x: auto;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.panelHead h3 {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+.tag {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.medCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.medDot {
+  width: 8px;
+  height: 22px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.medCell .nm {
+  font-weight: 600;
+}
+
+.medCell .cp {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.statusBadge.ok {
+  color: var(--green);
+  background: var(--green-dim);
+}
+
+.statusBadge.low {
+  color: var(--amber);
+  background: rgba(255, 184, 77, 0.14);
+}
+
+.statusBadge.exp {
+  color: var(--red);
+  background: rgba(255, 107, 107, 0.14);
+}
+
+.d {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}

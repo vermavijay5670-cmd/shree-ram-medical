@@ -1,0 +1,182 @@
+// Shree Ram Medical Agency — Prisma schema
+// Matches BUILD_BRIEF.md §5 exactly, with one intentional addition:
+// `OrderItem` — a line-item join table between Order and Medicine.
+// The brief's Order model has no way to know *what* was ordered, which the
+// admin dashboard needs for "revenue by company" and "top medicines by
+// volume". The brief explicitly invites this ("expand relations as needed").
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  logoUrl        String?
+  description    String
+  history        String?
+  website        String?
+  country        String
+  foundedYear    Int
+  segment        String
+  isDomestic     Boolean         @default(true)
+  isPopular      Boolean         @default(false)
+  plants         Plant[]
+  certifications Certification[]
+  medicines      Medicine[]
+  galleryImages  GalleryImage[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Plant {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  name      String
+  location  String
+  certs     String[]
+}
+
+model Certification {
+  id        String  @id @default(cuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+  name      String
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  medicines Medicine[]
+}
+
+model Medicine {
+  id                   String          @id @default(cuid())
+  name                 String
+  slug                 String          @unique
+  composition          String
+  strength             String
+  packaging            String
+  imageUrl             String?
+  companyId            String
+  company              Company         @relation(fields: [companyId], references: [id])
+  categoryId           String
+  category             Category        @relation(fields: [categoryId], references: [id])
+  mrp                  Decimal
+  sellingPrice         Decimal
+  gstRate              Decimal
+  prescriptionRequired Boolean         @default(false)
+  description          String
+  uses                 String
+  dosage               String
+  contraindications    String
+  warnings             String
+  sideEffects          String
+  interactions         String
+  storage              String
+  inventory            InventoryItem[]
+  orderItems           OrderItem[]
+  enquiryItems         EnquiryItem[]
+  createdAt            DateTime        @default(now())
+}
+
+model InventoryItem {
+  id                String   @id @default(cuid())
+  medicineId        String
+  medicine          Medicine @relation(fields: [medicineId], references: [id])
+  warehouse         String
+  batchNumber       String
+  expiryDate        DateTime
+  stockQty          Int
+  lowStockThreshold Int      @default(50)
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  password     String
+  role         Role      @default(RETAILER)
+  businessName String?
+  gstNumber    String?
+  orders       Order[]
+  enquiries    Enquiry[]
+  createdAt    DateTime  @default(now())
+}
+
+enum Role {
+  ADMIN
+  RETAILER
+  HOSPITAL
+  DISTRIBUTOR
+}
+
+model Enquiry {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  items     EnquiryItem[]
+  status    EnquiryStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+}
+
+model EnquiryItem {
+  id         String   @id @default(cuid())
+  enquiryId  String
+  enquiry    Enquiry  @relation(fields: [enquiryId], references: [id])
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  quantity   Int
+}
+
+enum EnquiryStatus {
+  PENDING
+  QUOTED
+  APPROVED
+  REJECTED
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  items       OrderItem[]
+  status      OrderStatus @default(PROCESSING)
+  totalAmount Decimal
+  createdAt   DateTime    @default(now())
+}
+
+// Added beyond the brief's literal schema — see file header note.
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  quantity   Int
+  unitPrice  Decimal
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  DELIVERED
+  CANCELLED
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  url       String
+  caption   String?
+  section   String // warehouse | office | packing | delivery | staff
+}

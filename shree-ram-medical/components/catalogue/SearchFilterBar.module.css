@@ -1,0 +1,83 @@
+.controls {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 6vw 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.searchWrap {
+  position: relative;
+  max-width: 440px;
+}
+
+.searchWrap input {
+  width: 100%;
+  padding: 14px 18px 14px 44px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  outline: none;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.searchWrap input:focus {
+  border-color: rgba(0, 217, 163, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.searchWrap input::placeholder {
+  color: var(--muted);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+  color: var(--text);
+  pointer-events: none;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  font-size: 13px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  font-family: var(--font-body);
+}
+
+.chip:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.chip.active {
+  background: var(--green-dim);
+  border-color: rgba(0, 217, 163, 0.5);
+  color: var(--green);
+}
+
+.resultCount {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}

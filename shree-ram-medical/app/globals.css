@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/*
+  Shree Ram Medical Agency — design tokens
+  Copied exactly from the approved HTML reference demos.
+  Do not casually change these values — see BUILD_BRIEF.md §3 and §9.
+*/
+:root {
+  --bg: #050505;
+  --surface: #0b0e0d;
+  --panel: #0a0c0b;
+  --line: rgba(237, 242, 240, 0.08);
+
+  --green: #00d9a3;
+  --green-strong: #00b389;
+  --green-dim: rgba(0, 217, 163, 0.14);
+  --blue: #3d5cff;
+  --blue-strong: #243fb8;
+  --blue-dim: rgba(61, 92, 255, 0.14);
+  --cyan: #6ee7f2;
+  --amber: #ffb84d;
+  --red: #ff6b6b;
+
+  --text: #edf2f0;
+  --muted: #8a938f;
+  --on-accent: #04120e;
+
+  --radius: 24px;
+  --radius-sm: 18px;
+  --radius-dense: 16px;
+
+  --font-display: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  --font-body: var(--font-inter), "Inter", sans-serif;
+}
+
+/* Tailwind v4 theme bridge — lets us use text-brand-green, bg-panel, font-display, etc. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+
+  --color-brand-green: var(--green);
+  --color-brand-green-strong: var(--green-strong);
+  --color-brand-green-dim: var(--green-dim);
+  --color-brand-blue: var(--blue);
+  --color-brand-blue-strong: var(--blue-strong);
+  --color-brand-blue-dim: var(--blue-dim);
+  --color-brand-cyan: var(--cyan);
+  --color-brand-amber: var(--amber);
+  --color-brand-red: var(--red);
+
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-on-accent: var(--on-accent);
+
+  --radius-brand: var(--radius);
+  --radius-brand-sm: var(--radius-sm);
+  --radius-brand-dense: var(--radius-dense);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* signature fine-grain noise overlay used on every page */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+}
+
+/* ambient page glow used on catalogue-style pages */
+.page-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(900px circle at 10% -10%, rgba(0, 217, 163, 0.08), transparent 55%),
+    radial-gradient(900px circle at 100% 0%, rgba(61, 92, 255, 0.08), transparent 55%);
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--green);
+  color: var(--on-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

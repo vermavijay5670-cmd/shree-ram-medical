@@ -1,0 +1,58 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { AdminShell } from "@/components/dashboard/AdminShell";
+import { companies } from "@/lib/data/companies";
+import styles from "@/components/dashboard/AdminTable.module.css";
+
+export const metadata: Metadata = { title: "Companies — Admin" };
+
+export default function AdminCompaniesPage() {
+  return (
+    <AdminShell title="Companies" subtitle={`${companies.length} manufacturing partners in the network`}>
+      <div className={styles.panel}>
+        <div className={styles.panelHead}>
+          <h3>All companies</h3>
+          <span className={styles.tag}>{companies.length} total</span>
+        </div>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Segment</th>
+              <th>Country</th>
+              <th>Founded</th>
+              <th>Products</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {companies.map((c) => (
+              <tr key={c.id}>
+                <td>
+                  <div className={styles.nameCell}>
+                    <div className={styles.dot} style={{ background: c.logoColors[0] }} />
+                    <div>
+                      <Link href={`/companies/${c.slug}`} className={styles.nm} style={{ textDecoration: "none", color: "inherit" }}>
+                        {c.name}
+                      </Link>
+                      <div className={styles.cp}>{c.isDomestic ? "Domestic" : "International"}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{c.segment}</td>
+                <td>{c.country}</td>
+                <td>{c.foundedYear}</td>
+                <td>{c.productsListed.toLocaleString("en-IN")}</td>
+                <td>
+                  <span className={`${styles.badge} ${c.isPopular ? styles.badgeGreen : styles.badgeMuted}`}>
+                    {c.isPopular ? "Popular partner" : "Active"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </AdminShell>
+  );
+}

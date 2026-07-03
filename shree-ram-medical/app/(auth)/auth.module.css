@@ -1,0 +1,140 @@
+.wrap {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 6vw;
+}
+
+.card {
+  width: 100%;
+  max-width: 460px;
+  padding: 36px;
+}
+
+.head h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+}
+
+.head p {
+  color: var(--muted);
+  font-size: 13.5px;
+  margin-top: 8px;
+}
+
+.form {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field input,
+.field select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--green);
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.error {
+  font-size: 12.5px;
+  color: var(--red);
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.success {
+  font-size: 12.5px;
+  color: var(--green);
+  background: var(--green-dim);
+  border: 1px solid rgba(0, 217, 163, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.demoBox {
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.demoTitle {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.demoRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  padding: 4px 0;
+  flex-wrap: wrap;
+}
+
+.demoRow span {
+  color: var(--muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.demoRow code {
+  color: var(--cyan);
+  font-size: 11.5px;
+  text-align: right;
+}
+
+.foot {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.foot a {
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 600;
+}

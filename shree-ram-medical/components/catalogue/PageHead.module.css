@@ -1,0 +1,33 @@
+.head {
+  position: relative;
+  z-index: 1;
+  padding: 64px 6vw 36px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.kicker {
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.01em;
+  max-width: 16ch;
+}
+
+.description {
+  margin-top: 14px;
+  color: var(--muted);
+  max-width: 56ch;
+  font-size: 15.5px;
+  line-height: 1.6;
+}

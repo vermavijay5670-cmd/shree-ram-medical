@@ -1,0 +1,44 @@
+.grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 6vw 100px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.tile {
+  padding: 26px 22px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.tile:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 217, 163, 0.35);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-top: 6px;
+}
