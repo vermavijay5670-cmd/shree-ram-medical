@@ -79,11 +79,7 @@ const raw: RawMedicine[] = [
     uses: "Treats bacterial infections of the respiratory tract, ear, sinus, skin, and urinary tract, including infections resistant to amoxicillin alone.",
     dosage: "Typically taken as one tablet every 12 hours, with a meal to reduce stomach upset. Course length and exact dosage should always follow the prescribing doctor's instructions.",
     contraindications: "Should not be used by patients with a known allergy to penicillin-class antibiotics, or with a history of liver problems linked to previous amoxicillin-clavulanate use.",
-    warnings: [
-      "Use with caution in patients with reduced kidney function",
-      "May affect the reliability of certain diabetic urine tests",
-      "Complete the full course even if symptoms improve early",
-    ],
+    warnings: ["Use with caution in patients with reduced kidney function","May affect the reliability of certain diabetic urine tests","Complete the full course even if symptoms improve early",],
     sideEffects: "Most commonly reported effects include nausea, diarrhoea, and mild skin rash. Rare but serious reactions such as severe allergic response or liver enzyme changes should prompt immediate medical attention.",
     interactions: "May interact with blood-thinning medication (increased bleeding risk) and allopurinol (higher chance of skin rash). Always share a full medication list with the prescribing physician.",
     storage: "Store below 25°C in a cool, dry place away from direct sunlight. Keep out of reach of children.",
