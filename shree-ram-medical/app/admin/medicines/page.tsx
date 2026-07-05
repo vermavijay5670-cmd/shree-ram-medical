@@ -1,21 +1,44 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { AdminShell } from "@/components/dashboard/AdminShell";
-import { medicines } from "@/lib/data/medicines";
+import { Button } from "@/components/shared/Button";
+import { getMedicines } from "@/lib/data/medicines";
 import { getInventoryForMedicine, isLowStock } from "@/lib/data/inventory";
+import { isDatabaseConfigured } from "@/lib/prisma";
 import { formatINR } from "@/lib/utils";
 import styles from "@/components/dashboard/AdminTable.module.css";
 
 export const metadata: Metadata = { title: "Medicines — Admin" };
 
-export default function AdminMedicinesPage() {
+export default async function AdminMedicinesPage() {
+  const medicines = await getMedicines();
+  const stockFlags = await Promise.all(
+    medicines.map(async (m) => {
+      const inv = await getInventoryForMedicine(m.slug);
+      return inv ? isLowStock(inv) : false;
+    })
+  );
+
   return (
     <AdminShell title="Medicines" subtitle={`${medicines.length} SKUs across the catalogue`}>
       <div className={styles.panel}>
         <div className={styles.panelHead}>
           <h3>All medicines</h3>
-          <span className={styles.tag}>{medicines.length} total</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span className={styles.tag}>{medicines.length} total</span>
+            <Button href="/admin/medicines/new" variant="primary">
+              <Plus size={14} style={{ marginRight: 6 }} />
+              Add Medicine
+            </Button>
+          </div>
         </div>
+        {!isDatabaseConfigured() && (
+          <p style={{ color: "var(--amber)", fontSize: 12.5, marginBottom: 16 }}>
+            No database connected yet — showing sample data. Medicines added below won&rsquo;t be
+            saved until <code>DATABASE_URL</code> is set.
+          </p>
+        )}
         <table className={styles.table}>
           <thead>
             <tr>
@@ -29,9 +52,8 @@ export default function AdminMedicinesPage() {
             </tr>
           </thead>
           <tbody>
-            {medicines.map((m) => {
-              const inv = getInventoryForMedicine(m.slug);
-              const low = inv ? isLowStock(inv) : false;
+            {medicines.map((m, i) => {
+              const low = stockFlags[i];
               return (
                 <tr key={m.id}>
                   <td>

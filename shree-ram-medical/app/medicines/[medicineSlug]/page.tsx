@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { medicines, getMedicineBySlug, getRelatedMedicines } from "@/lib/data/medicines";
+import { getMedicines, getMedicineBySlug, getRelatedMedicines } from "@/lib/data/medicines";
 import { getInventoryForMedicine } from "@/lib/data/inventory";
 import { MedicineDetailClient } from "@/components/catalogue/MedicineDetailClient";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const medicines = await getMedicines();
   return medicines.map((m) => ({ medicineSlug: m.slug }));
 }
 
@@ -14,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ medicineSlug: string }>;
 }): Promise<Metadata> {
   const { medicineSlug } = await params;
-  const medicine = getMedicineBySlug(medicineSlug);
+  const medicine = await getMedicineBySlug(medicineSlug);
   if (!medicine) return {};
   return {
     title: medicine.name,
@@ -28,11 +29,11 @@ export default async function MedicineDetailPage({
   params: Promise<{ medicineSlug: string }>;
 }) {
   const { medicineSlug } = await params;
-  const medicine = getMedicineBySlug(medicineSlug);
+  const medicine = await getMedicineBySlug(medicineSlug);
   if (!medicine) notFound();
 
-  const inventoryItem = getInventoryForMedicine(medicine.slug);
-  const related = getRelatedMedicines(medicine);
+  const inventoryItem = await getInventoryForMedicine(medicine.slug);
+  const related = await getRelatedMedicines(medicine);
 
   return (
     <MedicineDetailClient medicine={medicine} inventoryItem={inventoryItem} related={related} />

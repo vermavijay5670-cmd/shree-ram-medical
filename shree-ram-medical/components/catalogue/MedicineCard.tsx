@@ -4,14 +4,19 @@ import Link from "next/link";
 import { useRef } from "react";
 import type { Medicine } from "@/lib/types";
 import { discountPercent, formatINR } from "@/lib/utils";
-import { getInventoryForMedicine, isLowStock } from "@/lib/data/inventory";
 import { cn } from "@/lib/utils";
 import styles from "./MedicineCard.module.css";
 
-export function MedicineCard({ medicine, index = 0 }: { medicine: Medicine; index?: number }) {
+export function MedicineCard({
+  medicine,
+  index = 0,
+  lowStock = false,
+}: {
+  medicine: Medicine;
+  index?: number;
+  lowStock?: boolean;
+}) {
   const ref = useRef<HTMLDivElement>(null);
-  const inventoryItem = getInventoryForMedicine(medicine.slug);
-  const lowStock = inventoryItem ? isLowStock(inventoryItem) : false;
   const discount = discountPercent(medicine.mrp, medicine.sellingPrice);
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {

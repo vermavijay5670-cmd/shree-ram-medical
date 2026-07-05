@@ -26,31 +26,31 @@ async function main() {
   // --- Companies (+ plants + certifications) ---
   const companyIdBySlug = new Map<string, string>();
   for (const co of companies) {
+    const companyFields = {
+      name: co.name,
+      description: co.description,
+      history: co.history,
+      website: co.website,
+      country: co.country,
+      foundedYear: co.foundedYear,
+      segment: co.segment,
+      isDomestic: co.isDomestic,
+      isPopular: co.isPopular,
+      logoColorFrom: co.logoColors[0],
+      logoColorTo: co.logoColors[1],
+      productsListed: co.productsListed,
+      countriesServed: co.countriesServed,
+      tags: co.tags,
+      categories: co.categories,
+      timeline: co.timeline,
+      officeAddress: co.officeAddress,
+      phone: co.phone,
+      email: co.email,
+    };
     const record = await prisma.company.upsert({
       where: { slug: co.slug },
-      update: {
-        name: co.name,
-        description: co.description,
-        history: co.history,
-        website: co.website,
-        country: co.country,
-        foundedYear: co.foundedYear,
-        segment: co.segment,
-        isDomestic: co.isDomestic,
-        isPopular: co.isPopular,
-      },
-      create: {
-        name: co.name,
-        slug: co.slug,
-        description: co.description,
-        history: co.history,
-        website: co.website,
-        country: co.country,
-        foundedYear: co.foundedYear,
-        segment: co.segment,
-        isDomestic: co.isDomestic,
-        isPopular: co.isPopular,
-      },
+      update: companyFields,
+      create: { slug: co.slug, ...companyFields },
     });
     companyIdBySlug.set(co.slug, record.id);
 
@@ -82,6 +82,8 @@ async function main() {
         composition: med.composition,
         strength: med.strength,
         packaging: med.packaging,
+        colorFrom: med.colors[0],
+        colorTo: med.colors[1],
         companyId,
         categoryId,
         mrp: med.mrp,
@@ -92,7 +94,7 @@ async function main() {
         uses: med.uses,
         dosage: med.dosage,
         contraindications: med.contraindications,
-        warnings: med.warnings.join(" | "),
+        warnings: med.warnings,
         sideEffects: med.sideEffects,
         interactions: med.interactions,
         storage: med.storage,

@@ -43,32 +43,75 @@ marketing pages) and most of 5–6 (auth + admin) are built; milestones 1–2 an
 | Partner portal (dashboard/orders/invoices/wishlist/requests) | ✅ Functional, scoped to the logged-in user's mock orders |
 | Marketing pages (about/services/contact/blog/gallery/faq/categories) | ✅ Real, specific copy — not in the original demos, but required by §4's site map |
 | Contact form + registration | ✅ Real client-side validation (Zod + React Hook Form) posting to real API routes, storing in-memory |
-| **Database** (Postgres via Prisma) | ⏳ Schema written (`prisma/schema.prisma`) and seed script written (`prisma/seed.ts`), but **not connected** — see below |
+| **Database** (Postgres via Prisma) | ✅ Schema written (`prisma/schema.prisma`), seed script written (`prisma/seed.ts`), and the data layer (`lib/data/*.ts`) reads from it automatically once `DATABASE_URL` is set — falls back to sample data until then |
+| **Add Medicine / Add Company** (`/admin/medicines/new`, `/admin/companies/new`) | ✅ Real forms, writing straight to Postgres via API routes (`/api/admin/medicines`, `/api/admin/companies`), admin-only. This is how you add catalogue items going forward instead of editing `lib/data/*.ts` |
 | Cloudinary image upload | ⏳ Wired for `next/image` remote patterns; actual upload UI is a placeholder on `/admin/gallery` |
 | 3D hero (React Three Fiber) | ⏳ Still the CSS/SVG capsule field from the demo — brief explicitly allows this as a fallback |
 | GSAP / Lenis smooth scroll | ⏳ Not added — current motion uses Framer Motion + IntersectionObserver, which covers everything currently on the pages |
 | Enquiry "cart" (add multiple medicines to one quote request across pages) | ⏳ `MedicineCard`'s "Request Quote" button is currently inert; needs a global cart context — see below |
 | SEO pass, sitemap, JSON-LD, Lighthouse tuning | ⏳ Not started (§8 milestone 7) |
 
+### Which pages read from the database vs. sample data
+
+Once `DATABASE_URL` is set, these read live from Postgres: `/admin/*` (all admin pages), the two
+new admin forms, `/companies/[slug]`, `/medicines/[slug]`, `/categories`, `/categories/[slug]`, and
+the `/api/companies`, `/api/medicines`, `/api/inventory` routes.
+
+Still on sample data regardless of the database (a documented next step, not a bug): the
+`/companies` and `/medicines` grid/search pages (they're interactive client components — wiring
+them to the database means fetching through an API route or splitting them into a server+client
+pair, which is a contained follow-up), the homepage stats, the marketing `/about` and `/gallery`
+pages (cosmetic counts only), the admin dashboard's revenue/order analytics (synthetic demo data,
+unrelated to the catalogue), and the partner portal's orders/wishlist (demo data tied to the seeded
+accounts, not real transactions yet).
+
 ## Connecting the real database
 
 The whole app currently reads from `lib/data/*.ts` — plain TypeScript modules that export the same
-shape as the Prisma models (see `lib/types.ts`). This was a deliberate choice so the entire product
-is explorable without any infrastructure. To go live:
+shape as the Prisma models (see `lib/types.ts`). **This is now a graceful fallback, not the only
+option**: every read function checks `isDatabaseConfigured()` (in `lib/prisma.ts`) first — if
+`DATABASE_URL` is set, it queries Postgres via Prisma; if not, it returns the bundled sample data.
+So the site works with zero setup, and upgrades automatically the moment you connect a database.
 
-1. Create a Supabase Postgres project and copy the connection string into `.env` as `DATABASE_URL`
-   (copy `.env.example` → `.env` first).
-2. `npm run db:generate` (runs `prisma generate` — needs internet access to Prisma's engine CDN,
-   which this sandbox's network policy blocked during scaffolding, so it hasn't been run yet here).
-3. `npm run db:push` to create the tables (or set up `prisma migrate` if you want migration history).
-4. `npm run db:seed` — this runs `prisma/seed.ts`, which reads the exact same `lib/data/*` used by
-   the mock layer, so your seeded database will match what you've been looking at in dev.
-5. Swap the `lib/data/*.ts` functions for real `prisma.*.findMany()` calls (or introduce a React
-   Query layer per the brief's data-fetching choice) one page at a time. Function names
-   (`getCompanies`, `getMedicineBySlug`, `getOrdersForUser`, etc.) were deliberately written to
-   mirror what the eventual Prisma queries will look like.
-6. Point `lib/auth.ts`'s `authorize()` at a real `prisma.user.findUnique()` + bcrypt compare instead
-   of `lib/data/users.ts`.
+### Step-by-step: connect Supabase
+
+1. **Create a Supabase project** at [supabase.com](https://supabase.com) (free tier is fine).
+2. In your Supabase project: **Project Settings → Database → Connection string** → copy the
+   **URI** (make sure it's the "Session pooler" or direct connection string, not the pgBouncer
+   transaction-mode one unless you know you want that).
+3. In **Vercel → your project → Settings → Environment Variables**, add:
+   - `DATABASE_URL` = the connection string from step 2 (paste your actual Supabase password into
+     it where it says `[YOUR-PASSWORD]`)
+4. **Locally**, in your project folder, create a `.env` file (copy `.env.example` → `.env`) and
+   paste the same `DATABASE_URL` there too — this lets you run the next commands from your machine:
+   ```bash
+   npm install
+   npx prisma generate     # generates the Prisma Client from schema.prisma
+   npx prisma db push      # creates all the tables in your Supabase database
+   npm run db:seed         # populates it with the current sample companies/medicines/etc.
+   ```
+5. Back in Vercel, go to **Deployments** → redeploy (or just push a commit) so the live site picks
+   up `DATABASE_URL`. From this point on, the site reads and writes real data.
+
+**Note:** `npm run build`/`postinstall` already runs `prisma generate` automatically on every
+Vercel deploy (see `package.json`), so you don't need to remember that step for deploys — only for
+running Prisma CLI commands (`db push`, `db seed`, `studio`) from your own machine.
+
+### Adding medicines and companies without touching code
+
+Once the database is connected, **`/admin/medicines/new`** and **`/admin/companies/new`** are real,
+working forms — name, composition, MRP, selling price, GST rate, prescription flag, and an initial
+stock batch (warehouse, batch number, expiry date, quantity) all save straight to Postgres and show
+up immediately on `/admin/medicines`, `/admin/companies`, and the public catalogue pages that have
+been migrated to read from the database (see the table below). No more editing `lib/data/*.ts` by
+hand for day-to-day additions — that file now only matters as the fallback/seed dataset.
+
+To add more stock batches to an *existing* medicine later (as opposed to a new medicine), the
+quickest path right now is **Supabase's own table editor** (Table Editor → `InventoryItem` → Insert
+row) until a dedicated "Add Batch" admin form is built — that's a natural next addition, and a much
+smaller piece of work than what's already done here if you want it.
+
+
 
 **Schema note:** `prisma/schema.prisma` matches `BUILD_BRIEF.md` §5 exactly, with one addition —
 an `OrderItem` join model between `Order` and `Medicine`. The brief's `Order` model had no way to

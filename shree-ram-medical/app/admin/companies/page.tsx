@@ -1,19 +1,36 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { AdminShell } from "@/components/dashboard/AdminShell";
-import { companies } from "@/lib/data/companies";
+import { Button } from "@/components/shared/Button";
+import { getCompanies } from "@/lib/data/companies";
+import { isDatabaseConfigured } from "@/lib/prisma";
 import styles from "@/components/dashboard/AdminTable.module.css";
 
 export const metadata: Metadata = { title: "Companies — Admin" };
 
-export default function AdminCompaniesPage() {
+export default async function AdminCompaniesPage() {
+  const companies = await getCompanies();
+
   return (
     <AdminShell title="Companies" subtitle={`${companies.length} manufacturing partners in the network`}>
       <div className={styles.panel}>
         <div className={styles.panelHead}>
           <h3>All companies</h3>
-          <span className={styles.tag}>{companies.length} total</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span className={styles.tag}>{companies.length} total</span>
+            <Button href="/admin/companies/new" variant="primary">
+              <Plus size={14} style={{ marginRight: 6 }} />
+              Add Company
+            </Button>
+          </div>
         </div>
+        {!isDatabaseConfigured() && (
+          <p style={{ color: "var(--amber)", fontSize: 12.5, marginBottom: 16 }}>
+            No database connected yet — showing sample data. Companies added below won&rsquo;t be saved
+            until <code>DATABASE_URL</code> is set.
+          </p>
+        )}
         <table className={styles.table}>
           <thead>
             <tr>

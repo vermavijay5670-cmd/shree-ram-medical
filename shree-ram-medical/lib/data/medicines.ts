@@ -1,5 +1,6 @@
 import type { Medicine } from "@/lib/types";
 import { companies } from "@/lib/data/companies";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 
 function slugify(name: string) {
   return name
@@ -422,7 +423,7 @@ const raw: RawMedicine[] = [
   },
 ];
 
-export const medicines: Medicine[] = raw.map((m, i) => ({
+export const sampleMedicines: Medicine[] = raw.map((m, i) => ({
   id: `medicine-${i + 1}`,
   slug: slugify(m.name),
   name: m.name,
@@ -448,28 +449,115 @@ export const medicines: Medicine[] = raw.map((m, i) => ({
   storage: m.storage,
 }));
 
-export function getMedicines() {
-  return medicines;
+// Kept for code not yet migrated to the async getters below.
+export const medicines = sampleMedicines;
+
+function rowToMedicine(row: {
+  id: string;
+  name: string;
+  slug: string;
+  composition: string;
+  strength: string;
+  packaging: string;
+  colorFrom: string;
+  colorTo: string;
+  company: { slug: string; name: string };
+  category: { slug: string; name: string };
+  mrp: unknown;
+  sellingPrice: unknown;
+  gstRate: unknown;
+  prescriptionRequired: boolean;
+  description: string;
+  uses: string;
+  dosage: string;
+  contraindications: string;
+  warnings: string[];
+  sideEffects: string;
+  interactions: string;
+  storage: string;
+}): Medicine {
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    composition: row.composition,
+    strength: row.strength,
+    packaging: row.packaging,
+    colors: [row.colorFrom, row.colorTo],
+    companySlug: row.company.slug,
+    companyName: row.company.name,
+    categorySlug: row.category.slug,
+    categoryName: row.category.name,
+    mrp: Number(row.mrp),
+    sellingPrice: Number(row.sellingPrice),
+    gstRate: Number(row.gstRate),
+    prescriptionRequired: row.prescriptionRequired,
+    description: row.description,
+    uses: row.uses,
+    dosage: row.dosage,
+    contraindications: row.contraindications,
+    warnings: row.warnings,
+    sideEffects: row.sideEffects,
+    interactions: row.interactions,
+    storage: row.storage,
+  };
 }
 
-export function getMedicineBySlug(slug: string) {
-  return medicines.find((m) => m.slug === slug) ?? null;
+const medicineInclude = { company: true, category: true } as const;
+
+export async function getMedicines(): Promise<Medicine[]> {
+  if (!isDatabaseConfigured()) return sampleMedicines;
+  const rows = await prisma.medicine.findMany({ include: medicineInclude, orderBy: { name: "asc" } });
+  return rows.map(rowToMedicine);
 }
 
-export function getRelatedMedicines(medicine: Medicine, limit = 4) {
-  return medicines
-    .filter(
-      (m) =>
-        m.slug !== medicine.slug &&
-        (m.categorySlug === medicine.categorySlug || m.companySlug === medicine.companySlug)
-    )
-    .slice(0, limit);
+export async function getMedicineBySlug(slug: string): Promise<Medicine | null> {
+  if (!isDatabaseConfigured()) {
+    return sampleMedicines.find((m) => m.slug === slug) ?? null;
+  }
+  const row = await prisma.medicine.findUnique({ where: { slug }, include: medicineInclude });
+  return row ? rowToMedicine(row) : null;
 }
 
-export function getMedicinesByCompany(companySlug: string) {
-  return medicines.filter((m) => m.companySlug === companySlug);
+export async function getRelatedMedicines(medicine: Medicine, limit = 4): Promise<Medicine[]> {
+  if (!isDatabaseConfigured()) {
+    return sampleMedicines
+      .filter(
+        (m) =>
+          m.slug !== medicine.slug &&
+          (m.categorySlug === medicine.categorySlug || m.companySlug === medicine.companySlug)
+      )
+      .slice(0, limit);
+  }
+  const rows = await prisma.medicine.findMany({
+    where: {
+      slug: { not: medicine.slug },
+      OR: [{ category: { slug: medicine.categorySlug } }, { company: { slug: medicine.companySlug } }],
+    },
+    include: medicineInclude,
+    take: limit,
+  });
+  return rows.map(rowToMedicine);
 }
 
-export function getMedicinesByCategory(categorySlug: string) {
-  return medicines.filter((m) => m.categorySlug === categorySlug);
+export async function getMedicinesByCompany(companySlug: string): Promise<Medicine[]> {
+  if (!isDatabaseConfigured()) {
+    return sampleMedicines.filter((m) => m.companySlug === companySlug);
+  }
+  const rows = await prisma.medicine.findMany({
+    where: { company: { slug: companySlug } },
+    include: medicineInclude,
+  });
+  return rows.map(rowToMedicine);
+}
+
+export async function getMedicinesByCategory(categorySlug: string): Promise<Medicine[]> {
+  if (!isDatabaseConfigured()) {
+    return sampleMedicines.filter((m) => m.categorySlug === categorySlug);
+  }
+  const rows = await prisma.medicine.findMany({
+    where: { category: { slug: categorySlug } },
+    include: medicineInclude,
+  });
+  return rows.map(rowToMedicine);
 }

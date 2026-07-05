@@ -8,6 +8,7 @@ import { SearchFilterBar, type FilterOption } from "@/components/catalogue/Searc
 import { MedicineCard } from "@/components/catalogue/MedicineCard";
 import { medicines } from "@/lib/data/medicines";
 import { categories } from "@/lib/data/categories";
+import { sampleInventory, isLowStock } from "@/lib/data/inventory";
 import styles from "./medicines.module.css";
 
 export default function MedicinesPage() {
@@ -55,7 +56,10 @@ export default function MedicinesPage() {
             <p>Try a different name or clear your filters.</p>
           </div>
         ) : (
-          filtered.map((m, i) => <MedicineCard medicine={m} index={i} key={m.id} />)
+          filtered.map((m, i) => {
+            const item = sampleInventory.find((inv) => inv.medicineSlug === m.slug);
+            return <MedicineCard medicine={m} index={i} lowStock={item ? isLowStock(item) : false} key={m.id} />;
+          })
         )}
       </div>
       <Footer />

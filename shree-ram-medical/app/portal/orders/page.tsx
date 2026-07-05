@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { auth } from "@/lib/auth";
 import { getOrdersForUser } from "@/lib/data/orders";
-import { getMedicineBySlug } from "@/lib/data/medicines";
+import { medicines } from "@/lib/data/medicines";
 import { formatINR } from "@/lib/utils";
 import tableStyles from "@/components/dashboard/AdminTable.module.css";
 
@@ -47,7 +47,7 @@ export default async function PortalOrdersPage() {
                   <td className={tableStyles.nm}>{o.id}</td>
                   <td className={tableStyles.cp}>
                     {o.items
-                      .map((i) => getMedicineBySlug(i.medicineSlug)?.name ?? i.medicineSlug)
+                      .map((i) => medicines.find((m) => m.slug === i.medicineSlug)?.name ?? i.medicineSlug)
                       .join(", ")}
                   </td>
                   <td>{formatINR(o.totalAmount)}</td>

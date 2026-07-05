@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/dashboard/AdminShell";
-import { inventory, isExpiringSoon, isLowStock, formatExpiry } from "@/lib/data/inventory";
+import { getAllInventory, isExpiringSoon, isLowStock, formatExpiry } from "@/lib/data/inventory";
 import { getMedicineBySlug } from "@/lib/data/medicines";
+import { isDatabaseConfigured } from "@/lib/prisma";
 import styles from "@/components/dashboard/AdminTable.module.css";
 
 export const metadata: Metadata = { title: "Inventory — Admin" };
 
-export default function AdminInventoryPage() {
+export default async function AdminInventoryPage() {
+  const inventory = await getAllInventory();
   const sorted = [...inventory].sort((a, b) => (a.expiryDate < b.expiryDate ? -1 : 1));
+  const medicinesBySlug = await Promise.all(sorted.map((item) => getMedicineBySlug(item.medicineSlug)));
 
   return (
     <AdminShell title="Inventory" subtitle={`${inventory.length} batches across 3 warehouses`}>
+      {!isDatabaseConfigured() && (
+        <p style={{ color: "var(--amber)", fontSize: 12.5, marginBottom: 16 }}>
+          No database connected yet — showing sample data.
+        </p>
+      )}
       <div className={styles.panel}>
         <div className={styles.panelHead}>
           <h3>All batches</h3>
@@ -29,8 +37,8 @@ export default function AdminInventoryPage() {
             </tr>
           </thead>
           <tbody>
-            {sorted.map((item) => {
-              const medicine = getMedicineBySlug(item.medicineSlug);
+            {sorted.map((item, i) => {
+              const medicine = medicinesBySlug[i];
               const low = isLowStock(item);
               const expiring = isExpiringSoon(item.expiryDate, 60);
               const badgeClass = expiring ? styles.badgeRed : low ? styles.badgeAmber : styles.badgeGreen;

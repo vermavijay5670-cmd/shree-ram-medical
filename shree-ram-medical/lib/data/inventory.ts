@@ -1,5 +1,6 @@
 import type { InventoryItem } from "@/lib/types";
 import { medicines } from "@/lib/data/medicines";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 
 const warehouses = ["Patna Central", "Gaya Depot", "Muzaffarpur Hub"];
 
@@ -29,7 +30,7 @@ function batchFor(slug: string, seed: number) {
   return `${code}-${1000 + (seed % 9000)}`;
 }
 
-export const inventory: InventoryItem[] = medicines.map((m, i) => {
+export const sampleInventory: InventoryItem[] = medicines.map((m, i) => {
   const c = curated[m.slug];
   if (c) {
     return { id: `inv-${i + 1}`, medicineSlug: m.slug, ...c };
@@ -51,9 +52,8 @@ export const inventory: InventoryItem[] = medicines.map((m, i) => {
   };
 });
 
-export function getInventoryForMedicine(medicineSlug: string) {
-  return inventory.find((i) => i.medicineSlug === medicineSlug) ?? null;
-}
+// Kept for code not yet migrated to the async getters below.
+export const inventory = sampleInventory;
 
 export function formatExpiry(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -68,8 +68,46 @@ export function isLowStock(item: InventoryItem) {
   return item.stockQty < item.lowStockThreshold;
 }
 
-export function getInventoryAlerts() {
-  return inventory
+function rowToInventoryItem(row: {
+  id: string;
+  warehouse: string;
+  batchNumber: string;
+  expiryDate: Date;
+  stockQty: number;
+  lowStockThreshold: number;
+  medicine: { slug: string };
+}): InventoryItem {
+  return {
+    id: row.id,
+    medicineSlug: row.medicine.slug,
+    warehouse: row.warehouse,
+    batchNumber: row.batchNumber,
+    expiryDate: row.expiryDate.toISOString().slice(0, 10),
+    stockQty: row.stockQty,
+    lowStockThreshold: row.lowStockThreshold,
+  };
+}
+
+export async function getAllInventory(): Promise<InventoryItem[]> {
+  if (!isDatabaseConfigured()) return sampleInventory;
+  const rows = await prisma.inventoryItem.findMany({ include: { medicine: true } });
+  return rows.map(rowToInventoryItem);
+}
+
+export async function getInventoryForMedicine(medicineSlug: string): Promise<InventoryItem | null> {
+  if (!isDatabaseConfigured()) {
+    return sampleInventory.find((i) => i.medicineSlug === medicineSlug) ?? null;
+  }
+  const row = await prisma.inventoryItem.findFirst({
+    where: { medicine: { slug: medicineSlug } },
+    include: { medicine: true },
+  });
+  return row ? rowToInventoryItem(row) : null;
+}
+
+export async function getInventoryAlerts(): Promise<InventoryItem[]> {
+  const all = await getAllInventory();
+  return all
     .filter((item) => isLowStock(item) || isExpiringSoon(item.expiryDate))
     .sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
 }

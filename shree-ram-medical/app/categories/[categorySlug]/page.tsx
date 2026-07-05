@@ -6,6 +6,7 @@ import { PageHead } from "@/components/catalogue/PageHead";
 import { MedicineCard } from "@/components/catalogue/MedicineCard";
 import { getCategoryBySlug, categories } from "@/lib/data/categories";
 import { getMedicinesByCategory } from "@/lib/data/medicines";
+import { getInventoryForMedicine, isLowStock } from "@/lib/data/inventory";
 import styles from "@/app/medicines/medicines.module.css";
 
 export function generateStaticParams() {
@@ -18,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ categorySlug: string }>;
 }): Promise<Metadata> {
   const { categorySlug } = await params;
-  const category = getCategoryBySlug(categorySlug);
+  const category = await getCategoryBySlug(categorySlug);
   if (!category) return {};
   return { title: category.name };
 }
@@ -29,10 +30,16 @@ export default async function CategoryDetailPage({
   params: Promise<{ categorySlug: string }>;
 }) {
   const { categorySlug } = await params;
-  const category = getCategoryBySlug(categorySlug);
+  const category = await getCategoryBySlug(categorySlug);
   if (!category) notFound();
 
-  const medicines = getMedicinesByCategory(category.slug);
+  const medicines = await getMedicinesByCategory(category.slug);
+  const stockFlags = await Promise.all(
+    medicines.map(async (m) => {
+      const item = await getInventoryForMedicine(m.slug);
+      return item ? isLowStock(item) : false;
+    })
+  );
 
   return (
     <>
@@ -50,7 +57,7 @@ export default async function CategoryDetailPage({
             <p>Check back soon, or browse the full catalogue.</p>
           </div>
         ) : (
-          medicines.map((m, i) => <MedicineCard medicine={m} index={i} key={m.id} />)
+          medicines.map((m, i) => <MedicineCard medicine={m} index={i} lowStock={stockFlags[i]} key={m.id} />)
         )}
       </div>
       <Footer />

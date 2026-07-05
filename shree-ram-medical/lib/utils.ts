@@ -12,3 +12,13 @@ export function formatINR(amount: number) {
 export function discountPercent(mrp: number, price: number) {
   return Math.round((1 - price / mrp) * 100);
 }
+
+export function slugify(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[.'()]/g, "")
+    .replace(/&/g, "and")
+    .replace(/\+/g, "plus")
+    .trim()
+    .replace(/\s+/g, "-");
+}

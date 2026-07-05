@@ -4,11 +4,12 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/shared/Navbar";
 import { Footer } from "@/components/shared/Footer";
 import { Button } from "@/components/shared/Button";
-import { companies, getCompanyBySlug } from "@/lib/data/companies";
+import { getCompanies, getCompanyBySlug } from "@/lib/data/companies";
 import { getMedicinesByCompany } from "@/lib/data/medicines";
 import styles from "./profile.module.css";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const companies = await getCompanies();
   return companies.map((c) => ({ companySlug: c.slug }));
 }
 
@@ -18,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ companySlug: string }>;
 }): Promise<Metadata> {
   const { companySlug } = await params;
-  const company = getCompanyBySlug(companySlug);
+  const company = await getCompanyBySlug(companySlug);
   if (!company) return {};
   return {
     title: company.name,
@@ -32,10 +33,10 @@ export default async function CompanyProfilePage({
   params: Promise<{ companySlug: string }>;
 }) {
   const { companySlug } = await params;
-  const company = getCompanyBySlug(companySlug);
+  const company = await getCompanyBySlug(companySlug);
   if (!company) notFound();
 
-  const brands = getMedicinesByCompany(company.slug).slice(0, 8);
+  const brands = (await getMedicinesByCompany(company.slug)).slice(0, 8);
   const gradients: [string, string][] = [
     ["#00d9a333", "#00b38933"],
     ["#3d5cff33", "#243fb833"],

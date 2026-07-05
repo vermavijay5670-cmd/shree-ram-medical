@@ -1,4 +1,5 @@
 import type { Company } from "@/lib/types";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 
 function slugify(name: string) {
   return name
@@ -195,7 +196,7 @@ function fallbackDetail(base: { name: string; segment: string; foundedYear: numb
   };
 }
 
-export const companies: Company[] = roster.map((c, i) => {
+export const sampleCompanies: Company[] = roster.map((c, i) => {
   const slug = slugify(c.name);
   const detail = profileDetail[slug] ?? fallbackDetail(c);
   return {
@@ -207,14 +208,89 @@ export const companies: Company[] = roster.map((c, i) => {
   };
 });
 
-export function getCompanies() {
-  return companies;
+// Kept for code not yet migrated to the async getters below (client
+// components rendering the sample set synchronously).
+export const companies = sampleCompanies;
+
+function rowToCompany(row: {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  history: string | null;
+  website: string | null;
+  country: string;
+  foundedYear: number;
+  segment: string;
+  isDomestic: boolean;
+  isPopular: boolean;
+  logoColorFrom: string;
+  logoColorTo: string;
+  productsListed: number;
+  countriesServed: number;
+  tags: string[];
+  categories: string[];
+  timeline: unknown;
+  officeAddress: string | null;
+  phone: string | null;
+  email: string | null;
+  plants: { id: string; name: string; location: string; certs: string[] }[];
+}): Company {
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    logoInitials: initials(row.name),
+    logoColors: [row.logoColorFrom, row.logoColorTo],
+    description: row.description,
+    history: row.history ?? "",
+    timeline: Array.isArray(row.timeline) ? (row.timeline as { year: string; description: string }[]) : [],
+    website: row.website ?? undefined,
+    country: row.country,
+    foundedYear: row.foundedYear,
+    segment: row.segment,
+    isDomestic: row.isDomestic,
+    isPopular: row.isPopular,
+    productsListed: row.productsListed,
+    countriesServed: row.countriesServed,
+    tags: row.tags,
+    plants: row.plants,
+    categories: row.categories,
+    officeAddress: row.officeAddress ?? "",
+    phone: row.phone ?? "",
+    email: row.email ?? "",
+  };
 }
 
-export function getCompanyBySlug(slug: string) {
-  return companies.find((c) => c.slug === slug) ?? null;
+export async function getCompanies(): Promise<Company[]> {
+  if (!isDatabaseConfigured()) return sampleCompanies;
+  const rows = await prisma.company.findMany({
+    include: { plants: true },
+    orderBy: { name: "asc" },
+  });
+  return rows.map(rowToCompany);
 }
 
-export function getPopularCompanies(limit = 6) {
-  return companies.filter((c) => c.isPopular).slice(0, limit);
+export async function getCompanyBySlug(slug: string): Promise<Company | null> {
+  if (!isDatabaseConfigured()) {
+    return sampleCompanies.find((c) => c.slug === slug) ?? null;
+  }
+  const row = await prisma.company.findUnique({
+    where: { slug },
+    include: { plants: true },
+  });
+  return row ? rowToCompany(row) : null;
+}
+
+export async function getPopularCompanies(limit = 6): Promise<Company[]> {
+  if (!isDatabaseConfigured()) {
+    return sampleCompanies.filter((c) => c.isPopular).slice(0, limit);
+  }
+  const rows = await prisma.company.findMany({
+    where: { isPopular: true },
+    include: { plants: true },
+    orderBy: { name: "asc" },
+    take: limit,
+  });
+  return rows.map(rowToCompany);
 }

@@ -1,8 +1,10 @@
 import { Bell } from "lucide-react";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
+import { getInventoryAlerts } from "@/lib/data/inventory";
+import { getOrdersByStatus } from "@/lib/data/orders";
 import styles from "./AdminShell.module.css";
 
-export function AdminShell({
+export async function AdminShell({
   title,
   subtitle,
   children,
@@ -11,9 +13,13 @@ export function AdminShell({
   subtitle: string;
   children: React.ReactNode;
 }) {
+  const inventoryAlertCount = (await getInventoryAlerts()).length;
+  const statusCounts = getOrdersByStatus();
+  const activeOrderCount = statusCounts.PENDING + statusCounts.PROCESSING;
+
   return (
     <div className={styles.shell}>
-      <AdminSidebar />
+      <AdminSidebar inventoryAlertCount={inventoryAlertCount} activeOrderCount={activeOrderCount} />
       <main className={styles.main}>
         <div className={styles.topbar}>
           <div>

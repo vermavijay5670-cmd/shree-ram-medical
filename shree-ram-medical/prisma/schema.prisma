@@ -19,6 +19,8 @@ model Company {
   name           String
   slug           String          @unique
   logoUrl        String?
+  logoColorFrom  String          @default("#00d9a3")
+  logoColorTo    String          @default("#00b389")
   description    String
   history        String?
   website        String?
@@ -27,6 +29,14 @@ model Company {
   segment        String
   isDomestic     Boolean         @default(true)
   isPopular      Boolean         @default(false)
+  productsListed Int             @default(0)
+  countriesServed Int            @default(0)
+  tags           String[]        @default([])
+  categories     String[]        @default([]) // descriptive chips shown on the profile page
+  timeline       Json?           // [{ year: string, description: string }]
+  officeAddress  String?
+  phone          String?
+  email          String?
   plants         Plant[]
   certifications Certification[]
   medicines      Medicine[]
@@ -66,6 +76,8 @@ model Medicine {
   strength             String
   packaging            String
   imageUrl             String?
+  colorFrom            String          @default("#00d9a3")
+  colorTo              String          @default("#00b389")
   companyId            String
   company              Company         @relation(fields: [companyId], references: [id])
   categoryId           String
@@ -78,7 +90,7 @@ model Medicine {
   uses                 String
   dosage               String
   contraindications    String
-  warnings             String
+  warnings             String[]        @default([])
   sideEffects          String
   interactions         String
   storage              String

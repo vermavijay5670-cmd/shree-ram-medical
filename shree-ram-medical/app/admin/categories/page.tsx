@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/dashboard/AdminShell";
-import { categories } from "@/lib/data/categories";
+import { getCategories } from "@/lib/data/categories";
 import { getMedicinesByCategory } from "@/lib/data/medicines";
 import styles from "@/components/dashboard/AdminTable.module.css";
 
 export const metadata: Metadata = { title: "Categories — Admin" };
 
-export default function AdminCategoriesPage() {
+export default async function AdminCategoriesPage() {
+  const categories = await getCategories();
+  const counts = await Promise.all(categories.map((cat) => getMedicinesByCategory(cat.slug)));
+
   return (
     <AdminShell title="Categories" subtitle={`${categories.length} therapy areas organizing the catalogue`}>
       <div className={styles.grid}>
-        {categories.map((cat) => {
-          const count = getMedicinesByCategory(cat.slug).length;
+        {categories.map((cat, i) => {
+          const count = counts[i].length;
           return (
             <div className={styles.tile} key={cat.id}>
               <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15 }}>{cat.name}</div>

@@ -24,8 +24,8 @@ export const metadata: Metadata = {
   title: "Admin Dashboard",
 };
 
-export default function AdminDashboardPage() {
-  const alerts = getInventoryAlerts();
+export default async function AdminDashboardPage() {
+  const alerts = await getInventoryAlerts();
   const lowStockCount = alerts.filter((a) => isLowStock(a)).length;
   const expiringCount = alerts.filter((a) => isExpiringSoon(a.expiryDate, 60)).length;
 

@@ -17,8 +17,6 @@ import {
   Tag,
 } from "lucide-react";
 import { BrandMark } from "@/components/shared/BrandMark";
-import { getInventoryAlerts } from "@/lib/data/inventory";
-import { getOrdersByStatus } from "@/lib/data/orders";
 import styles from "./AdminShell.module.css";
 
 interface NavItem {
@@ -33,10 +31,14 @@ interface NavSection {
   items: NavItem[];
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({
+  inventoryAlertCount = 0,
+  activeOrderCount = 0,
+}: {
+  inventoryAlertCount?: number;
+  activeOrderCount?: number;
+}) {
   const pathname = usePathname();
-  const inventoryAlertCount = getInventoryAlerts().length;
-  const activeOrderCount = getOrdersByStatus().PENDING + getOrdersByStatus().PROCESSING;
 
   const sections: NavSection[] = [
     {

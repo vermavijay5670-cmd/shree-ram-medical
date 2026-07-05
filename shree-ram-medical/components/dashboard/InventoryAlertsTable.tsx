@@ -9,7 +9,9 @@ function statusFor(item: InventoryItem) {
   return { label: "In stock", cls: styles.ok };
 }
 
-export function InventoryAlertsTable({ items }: { items: InventoryItem[] }) {
+export async function InventoryAlertsTable({ items }: { items: InventoryItem[] }) {
+  const medicines = await Promise.all(items.map((item) => getMedicineBySlug(item.medicineSlug)));
+
   return (
     <div className={styles.tablePanel}>
       <div className={styles.panelHead}>
@@ -28,8 +30,8 @@ export function InventoryAlertsTable({ items }: { items: InventoryItem[] }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => {
-            const medicine = getMedicineBySlug(item.medicineSlug);
+          {items.map((item, i) => {
+            const medicine = medicines[i];
             const status = statusFor(item);
             return (
               <tr key={item.id}>
