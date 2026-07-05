@@ -102,21 +102,21 @@ export default function ContactPage() {
               <MapPin size={18} color="var(--green)" />
               <div>
                 <div className={styles.infoTitle}>Regional Office</div>
-                <div className={styles.infoText}>Shree Ram Medical Agency, Harichak, pachamba, giridih, Jharkhand (815316) </div>
+                <div className={styles.infoText}>Shree Ram Medical Agency, Boring Road, Patna, Bihar 800001</div>
               </div>
             </GlassCard>
             <GlassCard className={styles.infoCard}>
               <Phone size={18} color="var(--green)" />
               <div>
                 <div className={styles.infoTitle}>Phone</div>
-                <div className={styles.infoText}>+91 9142664326</div>
+                <div className={styles.infoText}>+91 612 456 7890</div>
               </div>
             </GlassCard>
             <GlassCard className={styles.infoCard}>
               <Mail size={18} color="var(--green)" />
               <div>
                 <div className={styles.infoTitle}>Email</div>
-                <div className={styles.infoText}>vermavijay5670@gmail.com</div>
+                <div className={styles.infoText}>orders@shreerammedical.example</div>
               </div>
             </GlassCard>
           </div>

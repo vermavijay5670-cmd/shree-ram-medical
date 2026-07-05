@@ -97,6 +97,13 @@ So the site works with zero setup, and upgrades automatically the moment you con
 Vercel deploy (see `package.json`), so you don't need to remember that step for deploys — only for
 running Prisma CLI commands (`db push`, `db seed`, `studio`) from your own machine.
 
+**Why Prisma is pinned to v6:** Prisma 7 moved database connection URLs out of `schema.prisma`
+entirely into a separate `prisma.config.ts` file with a different driver-adapter setup, and that
+whole system was still actively changing as of this writing. `package.json` pins `prisma` and
+`@prisma/client` to `^6.19.3`, where `url = env("DATABASE_URL")` in `schema.prisma` works exactly
+as written in this project. Don't run `npm install prisma@latest` without checking Prisma's current
+docs first — it will reintroduce the v7 config migration.
+
 ### Adding medicines and companies without touching code
 
 Once the database is connected, **`/admin/medicines/new`** and **`/admin/companies/new`** are real,
