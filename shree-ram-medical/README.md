@@ -76,14 +76,18 @@ So the site works with zero setup, and upgrades automatically the moment you con
 ### Step-by-step: connect Supabase
 
 1. **Create a Supabase project** at [supabase.com](https://supabase.com) (free tier is fine).
-2. In your Supabase project: **Project Settings → Database → Connection string** → copy the
-   **URI** (make sure it's the "Session pooler" or direct connection string, not the pgBouncer
-   transaction-mode one unless you know you want that).
-3. In **Vercel → your project → Settings → Environment Variables**, add:
-   - `DATABASE_URL` = the connection string from step 2 (paste your actual Supabase password into
-     it where it says `[YOUR-PASSWORD]`)
+2. In your Supabase project, click the green **Connect** button (top of the dashboard) → choose the
+   **ORMs** tab → **Prisma**. Supabase shows you two connection strings — copy both:
+   - `DATABASE_URL` — the pooled connection, used for normal app queries
+   - `DIRECT_URL` — the direct connection, used only when running `prisma db push` / `migrate`
+
+   Both include a `[YOUR-PASSWORD]` placeholder — replace it with your actual database password
+   (the one you saved when creating the project) in **both** strings.
+3. In **Vercel → your project → Settings → Environment Variables**, add both:
+   - `DATABASE_URL` = the pooled connection string
+   - `DIRECT_URL` = the direct connection string
 4. **Locally**, in your project folder, create a `.env` file (copy `.env.example` → `.env`) and
-   paste the same `DATABASE_URL` there too — this lets you run the next commands from your machine:
+   paste both of the same values there too — this lets you run the next commands from your machine:
    ```bash
    npm install
    npx prisma generate     # generates the Prisma Client from schema.prisma
@@ -91,7 +95,7 @@ So the site works with zero setup, and upgrades automatically the moment you con
    npm run db:seed         # populates it with the current sample companies/medicines/etc.
    ```
 5. Back in Vercel, go to **Deployments** → redeploy (or just push a commit) so the live site picks
-   up `DATABASE_URL`. From this point on, the site reads and writes real data.
+   up the new environment variables. From this point on, the site reads and writes real data.
 
 **Note:** `npm run build`/`postinstall` already runs `prisma generate` automatically on every
 Vercel deploy (see `package.json`), so you don't need to remember that step for deploys — only for
